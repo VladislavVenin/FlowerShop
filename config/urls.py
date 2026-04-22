@@ -8,6 +8,8 @@ from flower_shop import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", views.index, name="index"),
+    path("catalog/", views.catalog, name="catalog"),
+    path("consultation/", views.consultation, name="consultation"),
 ]
 
 if settings.DEBUG:

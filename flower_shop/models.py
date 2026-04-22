@@ -12,6 +12,7 @@ class Flower(models.Model):
 class Bouquet(models.Model):
     name = models.CharField(max_length=10, unique=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(null=True)
     flowers = models.ManyToManyField(Flower, related_name='bouquets')
     width = models.CharField(max_length=10)
     height = models.CharField(max_length=10)

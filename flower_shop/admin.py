@@ -1,4 +1,4 @@
-from .models import Flower, Bouquet, Order
+from .models import Flower, Bouquet, Order, Event
 from django.contrib import admin
 from django.utils.html import format_html
 
@@ -33,3 +33,9 @@ class OrderAdmin(admin.ModelAdmin):
         'address', 'created_at'
     )
     search_fields = ('client_name', 'phone_number', 'address')
+
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at')
+    search_fields = ('name',)

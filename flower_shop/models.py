@@ -9,10 +9,19 @@ class Flower(models.Model):
         return self.name
 
 
+class Event(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Bouquet(models.Model):
     name = models.CharField(max_length=10, unique=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(null=True)
+    event = models.ManyToManyField(Event, related_name='events')
     flowers = models.ManyToManyField(Flower, related_name='bouquets')
     width = models.CharField(max_length=10)
     height = models.CharField(max_length=10)
@@ -25,7 +34,10 @@ class Bouquet(models.Model):
 
 
 class Order(models.Model):
-    bouquet = models.ForeignKey(Bouquet, on_delete=models.CASCADE)
+    bouquet = models.ForeignKey(
+        Bouquet, related_name='orders',
+        on_delete=models.CASCADE
+    )
     client_name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=20)
     address = models.CharField(max_length=100)

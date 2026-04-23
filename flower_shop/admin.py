@@ -54,6 +54,7 @@ class OrderAdmin(admin.ModelAdmin):
         'address', 'payment_status_display',
         'created_at'
     )
+    list_filter = (BouquetNullFilter,)
 
     search_fields = ('client_name', 'phone_number', 'address')
 

@@ -15,7 +15,6 @@ urlpatterns = [
     path('quiz-step/', views.quiz_step, name='quiz_step'),
     path('result/', views.result, name='result'),
     path("order/<int:id>/", views.order, name="order"),
-    path('order/<int:id>/', views.order, name='order'),
     path('payment/result/', views.payment_result, name='payment_result'),
     path('payment/webhook/', views.yookassa_webhook, name='yookassa_webhook'),
 ]

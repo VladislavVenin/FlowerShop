@@ -8,6 +8,7 @@ class FlowerAdmin(admin.ModelAdmin):
     list_display = ('name', 'created_at')
     search_fields = ('name',)
 
+
 @admin.register(Bouquet)
 class BouquetAdmin(admin.ModelAdmin):
     list_display = (
@@ -17,7 +18,7 @@ class BouquetAdmin(admin.ModelAdmin):
     list_editable = ('price', )
     editable_fields = ('name', 'price')
     search_fields = ('name',)
-    filter_horizontal = ('flowers',)
+    filter_horizontal = ('flowers', 'events')
 
     def image_preview(self, obj):
         html_template = (
@@ -25,6 +26,7 @@ class BouquetAdmin(admin.ModelAdmin):
             max-height: 200px;" alt="{}" />'''
         )
         return format_html(html_template, obj.image.url, obj.name)
+
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):

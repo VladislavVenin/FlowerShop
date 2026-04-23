@@ -51,10 +51,22 @@ class BouquetNullFilter(SimpleListFilter):
 class OrderAdmin(admin.ModelAdmin):
     list_display = (
         'bouquet', 'client_name', 'phone_number',
-        'address', 'created_at'
+        'address', 'payment_status_display',
+        'created_at'
     )
-    list_filter = (BouquetNullFilter,)
+
     search_fields = ('client_name', 'phone_number', 'address')
+
+    def payment_status_display(self, obj):
+        status_map = {
+            'pending': 'Ожидает оплаты',
+            'paid': 'Оплачено',
+            'failed': 'Не оплачено',
+        }
+
+        return status_map.get(obj.payment_status, obj.payment_status)
+
+    payment_status_display.short_description = 'Статус платежа'
 
 
 @admin.register(Event)

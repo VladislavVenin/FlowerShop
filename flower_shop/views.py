@@ -1,16 +1,16 @@
+import random
 
-from .models import Bouquet, Order, Event
-from .forms import ConsultationForm
-
-
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
-from more_itertools import chunked
 from django.db.models import Prefetch
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from more_itertools import chunked
 
 from .forms import ConsultationForm
-from .models import Bouquet, Order
+from .models import Bouquet, Event, Order
+from .payment import create_payment, yookassa_webhook
 
 
 def index(request):
@@ -144,6 +144,7 @@ def result(request):
     selected_bouquet = random.choice(bouquet_list) if bouquet_list else None
     return render(request, 'result.html', {"bouquet": selected_bouquet})
 
+
 def order(request, id):
     bouquet = get_object_or_404(Bouquet, id=id)
 
@@ -152,16 +153,34 @@ def order(request, id):
         phone = request.POST.get("tel")
         address = request.POST.get("adres")
 
-        Order.objects.create(
+        order = Order.objects.create(
             bouquet=bouquet,
             client_name=name,
             phone_number=phone,
-            address=address
+            address=address,
+            payment_status='pending'
         )
-        return redirect("index")
+
+        try:
+            payment_url = create_payment(order)
+            return redirect(payment_url)
+        except Exception as e:
+            messages.error(request, f'Не удалось создать платёж. Попробуйте позже. Ошибка: {e}')
+            context = {"bouquet": bouquet}
+            return render(request, "order.html", context)
 
     context = {
         "bouquet": bouquet,
     }
     return render(request, "order.html", context)
 
+
+def payment_result(request):
+    return render(request, 'payment_result.html')
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def yookassa_webhook_view(request):
+    yookassa_webhook(request.body)
+    # Сервису юкасса нужен ответ 200
+    return HttpResponse(status=200)

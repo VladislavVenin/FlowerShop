@@ -41,6 +41,12 @@ class Bouquet(models.Model):
 
 
 class Order(models.Model):
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Ожидает оплаты'),
+        ('paid', 'Оплачено'),
+        ('failed', 'Не оплачено'),
+    ]
+
     bouquet = models.ForeignKey(
         Bouquet, related_name='orders',
         blank=True, null=True,
@@ -50,6 +56,13 @@ class Order(models.Model):
     phone_number = PhoneNumberField(region='RU')
     address = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    payment_status = models.CharField(
+        max_length=20, 
+        choices=PAYMENT_STATUS_CHOICES, 
+        default='pending'
+    )
+    yookassa_transaction_id = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         if self.bouquet:

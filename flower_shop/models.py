@@ -1,4 +1,5 @@
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Flower(models.Model):
@@ -39,7 +40,7 @@ class Order(models.Model):
         on_delete=models.CASCADE
     )
     client_name = models.CharField(max_length=50)
-    phone_number = models.CharField(max_length=20)
+    phone_number = PhoneNumberField(region='RU')
     address = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 

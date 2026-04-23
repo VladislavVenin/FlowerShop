@@ -11,6 +11,7 @@ urlpatterns = [
     path("catalog/", views.catalog, name="catalog"),
     path("consultation/", views.consultation, name="consultation"),
     path("card/<int:id>/", views.card, name="card"),
+    path("order/<int:id>/", views.order, name="order"),
 ]
 
 if settings.DEBUG:

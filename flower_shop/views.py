@@ -1,9 +1,9 @@
-from .models import Bouquet, Order
-from .forms import ConsultationForm
-
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
 from more_itertools import chunked
+
+from .forms import ConsultationForm
+from .models import Bouquet, Order
 
 
 def index(request):
@@ -51,3 +51,25 @@ def consultation(request):
             return render(request, 'consultation.html', {'form': form})
     form = ConsultationForm()
     return render(request, 'consultation.html', {'form': form})
+
+
+def order(request, id):
+    bouquet = get_object_or_404(Bouquet, id=id)
+
+    if request.method == "POST":
+        name = request.POST.get("fname")
+        phone = request.POST.get("tel")
+        address = request.POST.get("adres")
+
+        Order.objects.create(
+            bouquet=bouquet,
+            client_name=name,
+            phone_number=phone,
+            address=address
+        )
+        return redirect("index")
+
+    context = {
+        "bouquet": bouquet,
+    }
+    return render(request, "order.html", context)

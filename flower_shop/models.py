@@ -18,7 +18,7 @@ class Event(models.Model):
 
 
 class Bouquet(models.Model):
-    name = models.CharField(max_length=10, unique=True)
+    name = models.CharField(max_length=100, unique=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(null=True)
     events = models.ManyToManyField(Event, related_name='bouquets')

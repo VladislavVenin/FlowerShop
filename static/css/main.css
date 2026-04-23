@@ -166,6 +166,7 @@ bottom: 0;
 	width: 398px;
 	height: 400px;
 	margin-right: 9px;
+	cursor: pointer;
 }
 .recommended__block:last-child {
 	margin-right: 0;

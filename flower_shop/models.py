@@ -28,7 +28,13 @@ class Bouquet(models.Model):
     height = models.CharField(max_length=10)
     created_at = models.DateTimeField(auto_now_add=True)
     is_available = models.BooleanField(default=True)
+    is_recommended = models.BooleanField(default=False)
     image = models.ImageField(upload_to='bouquets/')
+
+    class Meta:
+        ordering = ('-is_recommended',)
+        verbose_name = 'Букет'
+        verbose_name_plural = 'Букеты'
 
     def __str__(self):
         return self.name

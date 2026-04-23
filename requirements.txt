@@ -2,3 +2,4 @@ Django==6.0.4
 environs[django]
 pillow==12.2.0
 django-phonenumber-field[phonenumbers]
+more-itertools==11.0.2

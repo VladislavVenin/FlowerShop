@@ -1,6 +1,7 @@
 from .models import Flower, Bouquet, Order, Event
 from django.contrib import admin
 from django.utils.html import format_html
+from django.contrib.admin import SimpleListFilter
 
 
 @admin.register(Flower)
@@ -28,12 +29,31 @@ class BouquetAdmin(admin.ModelAdmin):
         return format_html(html_template, obj.image.url, obj.name)
 
 
+class BouquetNullFilter(SimpleListFilter):
+    title = "Ожидает консультации"
+    parameter_name = 'bouquet__isnull'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Есть букет'),
+            ('no', 'Нет букета'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            return queryset.filter(bouquet__isnull=False)
+        if self.value() == 'no':
+            return queryset.filter(bouquet__isnull=True)
+        return queryset
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = (
         'bouquet', 'client_name', 'phone_number',
         'address', 'created_at'
     )
+    list_filter = (BouquetNullFilter,)
     search_fields = ('client_name', 'phone_number', 'address')
 
 

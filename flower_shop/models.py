@@ -43,6 +43,7 @@ class Bouquet(models.Model):
 class Order(models.Model):
     bouquet = models.ForeignKey(
         Bouquet, related_name='orders',
+        blank=True, null=True,
         on_delete=models.CASCADE
     )
     client_name = models.CharField(max_length=50)
@@ -51,5 +52,9 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'''Букет {self.bouquet.name}, заказчик {self.client_name},
+        if self.bouquet:
+            bouquet_name = self.bouquet.name
+        else:
+            bouquet_name = "ещё не выбран"
+        return f'''Букет {bouquet_name}, заказчик {self.client_name},
         телефон {self.phone_number}, адрес {self.address}'''

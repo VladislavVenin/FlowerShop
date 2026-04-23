@@ -1,6 +1,8 @@
-from .models import Bouquet
+from .models import Bouquet, Order
+from .forms import ConsultationForm
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from more_itertools import chunked
 
 
@@ -32,4 +34,20 @@ def card(request, id):
 
 
 def consultation(request):
-    return render(request, "consultation.html")
+    if request.method == 'POST':
+        form = ConsultationForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            phone = form.cleaned_data['phone']
+
+            Order.objects.create(
+                client_name=name,
+                phone_number=phone,
+            )
+            messages.success(request, f'Спасибо, {name}! Мы свяжемся с вами в ближайшее время.')
+            return redirect('consultation')
+        else:
+            messages.error(request, 'Пожалуйста, проверьте правильность заполнения формы.')
+            return render(request, 'consultation.html', {'form': form})
+    form = ConsultationForm()
+    return render(request, 'consultation.html', {'form': form})

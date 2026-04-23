@@ -1,0 +1,13 @@
+{% load static humanize %}
+
+{% with bg=bouquet.image|default:bouquet.image_card %}
+<a href="{% url 'card' bouquet.id %}"
+   class="recommended__block"
+   style="background: url('{% if bg %}{{ bg.url }}{% else %}{% static 'img/catalog/catalogBg1.jpg' %}{% endif %}') no-repeat center bottom / cover;"
+   aria-label="{{ bouquet.name }}">
+  <div class="recommended__block_elems ficb">
+    <span class="recommended__block_intro">{{ bouquet.name }}</span>
+    <span class="recommended__block_price">{{ bouquet.price|floatformat:0|intcomma:True }} руб</span>
+  </div>
+</a>
+{% endwith %}

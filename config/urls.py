@@ -14,7 +14,8 @@ urlpatterns = [
     path('quiz/', views.quiz, name='quiz'),
     path('quiz-step/', views.quiz_step, name='quiz_step'),
     path('result/', views.result, name='result'),
-]
+    path("order/<int:id>/", views.order, name="order"),
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

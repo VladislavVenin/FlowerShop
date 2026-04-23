@@ -1,11 +1,16 @@
+
 from .models import Bouquet, Order, Event
 from .forms import ConsultationForm
 
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
 from more_itertools import chunked
 from django.db.models import Prefetch
+
+from .forms import ConsultationForm
+from .models import Bouquet, Order
 
 
 def index(request):
@@ -138,3 +143,25 @@ def result(request):
 
     selected_bouquet = random.choice(bouquet_list) if bouquet_list else None
     return render(request, 'result.html', {"bouquet": selected_bouquet})
+
+def order(request, id):
+    bouquet = get_object_or_404(Bouquet, id=id)
+
+    if request.method == "POST":
+        name = request.POST.get("fname")
+        phone = request.POST.get("tel")
+        address = request.POST.get("adres")
+
+        Order.objects.create(
+            bouquet=bouquet,
+            client_name=name,
+            phone_number=phone,
+            address=address
+        )
+        return redirect("index")
+
+    context = {
+        "bouquet": bouquet,
+    }
+    return render(request, "order.html", context)
+

@@ -47,15 +47,16 @@ def consultation(request):
         if form.is_valid():
             name = form.cleaned_data['name']
             phone = form.cleaned_data['phone']
-
             Order.objects.create(
                 client_name=name,
                 phone_number=phone,
             )
             messages.success(request, f'Спасибо, {name}! Мы свяжемся с вами в ближайшее время.')
-            return redirect('consultation')
+            return redirect(request.META.get('HTTP_REFERER', 'consultation'))
         else:
             messages.error(request, 'Пожалуйста, проверьте правильность заполнения формы.')
+            if request.META.get('HTTP_REFERER'):
+                return redirect(request.META.get('HTTP_REFERER'))
             return render(request, 'consultation.html', {'form': form})
     form = ConsultationForm()
     return render(request, 'consultation.html', {'form': form})

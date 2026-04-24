@@ -2,15 +2,31 @@
 {% load static %}
 {% block consult %}
 <section id="consultation">
-	<div class="container">
-		<div class="consultation">
-			<div class="title consultation__title">Оставьте заявку на консультацию</div>
-			<form action="#" class="consultation__form">
-				<input type="text" name="fname" class="consultation__form_input" placeholder="Введите Имя" required>
-				<input type="text" name="tel" class="consultation__form_input" placeholder="+ 7 (999) 000 00 00" required>
-				<button type="submit" class="consultation__form_btn">Отправить</button>
-			</form>
-		</div>
-	</div>
+    <div class="container">
+        <div class="consultation">
+            <div class="title consultation__title">Оставьте заявку на консультацию</div>
+            <form action="{% url 'consultation' %}" method="POST" class="consultation__form">
+                {% csrf_token %}
+                <input type="text" name="name" class="consultation__form_input" placeholder="Введите Имя" required>
+                <input type="tel" name="phone" class="consultation__form_input" placeholder="+ 7 (999) 000 00 00" required>
+                <button type="submit" class="consultation__form_btn">Отправить</button>
+				<div class="chekbox fic">
+                    <input type="checkbox" name="agreement" class="singUpConsultation__ckekbox" checked required>
+                    <span class="chekbox__intro" style="color:#FFFFFF;">Я согласен(а) с политикой конфидециоальности</span>
+                </div>
+            </form>
+        </div>
+    </div>
 </section>
+<script>
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            alert("✅ {{ message }}");
+        {% elif message.tags == 'error' %}
+            alert("❌ {{ message }}");
+        {% else %}
+            alert("{{ message }}");
+        {% endif %}
+    {% endfor %}
+</script>
 {% endblock consult %}

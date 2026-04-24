@@ -16,7 +16,7 @@ urlpatterns = [
     path('result/', views.result, name='result'),
     path("order/<int:id>/", views.order, name="order"),
     path('payment/result/', views.payment_result, name='payment_result'),
-    path('payment/webhook/', views.yookassa_webhook, name='yookassa_webhook'),
+    path('payment/webhook/', views.yookassa_webhook_view, name='yookassa_webhook'),
 ]
 
 

@@ -159,10 +159,10 @@ def order(request, id):
                 {'bouquet': bouquet, 'time_slots': get_available_slots()}
             )
 
-        # проверка доступности если уже на странице
+        # проверка доступности если страница долго открыта и слоты изменились
         available_slots = get_available_slots()
         chosen_slot = next(
-            (s for s in available_slots if s['start'] == start_time and s['end'] == end_time),
+            (slot for slot in available_slots if slot['start'] == start_time and slot['end'] == end_time),
             None
         )
         if not chosen_slot:

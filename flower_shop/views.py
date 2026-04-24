@@ -1,6 +1,7 @@
 import random
 
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -153,13 +154,18 @@ def order(request, id):
         phone = request.POST.get("tel")
         address = request.POST.get("adres")
 
-        order = Order.objects.create(
-            bouquet=bouquet,
-            client_name=name,
-            phone_number=phone,
-            address=address,
-            payment_status='pending'
-        )
+        try:
+            order = Order.objects.create(
+                bouquet=bouquet,
+                client_name=name,
+                phone_number=phone,
+                address=address,
+                payment_status='pending'
+            )
+        except ValidationError as e:
+            messages.error(request, f'Некорректный номер телефона: {e}')
+            context = {"bouquet": bouquet}
+            return render(request, "order.html", context)
 
         try:
             payment_url = create_payment(order)
@@ -177,6 +183,7 @@ def order(request, id):
 
 def payment_result(request):
     return render(request, 'payment_result.html')
+
 
 @csrf_exempt
 @require_http_methods(["POST"])

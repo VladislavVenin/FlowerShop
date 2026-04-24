@@ -9,7 +9,7 @@
 					{% for row in rows %}
 					<div class="recommended__elems ficb recommended__elems_first">
 						{% for bouquet in row %}
-						<div onclick="location.href='/card/{{bouquet.id}}';" class="recommended__block recommended__block_first" style="background: url({{bouquet.image.url}}) no-repeat center bottom / cover;">
+						<div onclick="location.href='{% url "card" bouquet.id %}';" class="recommended__block recommended__block_first" style="background: url({{bouquet.image.url}}) no-repeat center bottom / cover;">
 							<div class="recommended__block_elems ficb">
 								<span class="recommended__block_intro">{{bouquet.name}}</span>
 								<span class="recommended__block_price">{{bouquet.price}} руб.</span>

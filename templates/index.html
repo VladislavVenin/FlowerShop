@@ -7,7 +7,7 @@
 			<div class="title">Рекомендуем</div>
 			<div class="recommended__elems ficb">
 				{% for bouquet in recommended %}
-				<div onclick="location.href='/card/{{bouquet.id}}';" class="recommended__block recommended__block_first" style="background: url({{bouquet.image.url}}) no-repeat center bottom / cover;">
+				<div onclick="location.href='{% url "card" bouquet.id %}';" class="recommended__block recommended__block_first" style="background: url({{bouquet.image.url}}) no-repeat center bottom / cover;">
 					<div class="recommended__block_elems ficb">
 						<span class="recommended__block_intro">{{bouquet.name}}</span>
 						<span class="recommended__block_price">{{bouquet.price}}руб</span>
@@ -15,7 +15,7 @@
 				</div>
 				{% endfor %}
 			</div>
-			<button onclick="window.location.href='catalog/';" class="btn recommended__btn">Показать всю коллекцию</button>
+			<button onclick="window.location.href={% url "catalog" %};" class="btn recommended__btn">Показать всю коллекцию</button>
 		</div>
 	</div>
 </section>
@@ -43,7 +43,7 @@
 					<script type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Af39d7a7f1829359b6ffe21ab6356fcaeace17d528d6522dba8772f885c8b1a7d&amp;width=398&amp;height=316&amp;lang=ru_RU&amp;scroll=true"></script>
 				</div>					
 			</div>
-			<button onclick="window.location.href='consultation/';" class="btn contacts__btn">Заказать доставку</button>
+			<button onclick="window.location.href={% url "consultation" %};" class="btn contacts__btn">Заказать доставку</button>
 		</div>
 	</div>
 </section>

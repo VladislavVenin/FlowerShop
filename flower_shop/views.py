@@ -61,7 +61,6 @@ def consultation(request):
 
 
 def quiz(request):
-    #тут цикл из событий
     if request.method == 'POST':
         event = request.POST.get('event')
         request.session['quiz'] = {'event': event}
@@ -81,63 +80,46 @@ def quiz_step(request):
         return redirect('result')
     return render(request, 'quiz-step.html')
 
-
 def result(request):
     data = request.session.get('quiz')
-    event_id = data['event']
-    price_id =data['price']
+    
+    if not data:
+        return redirect('quiz')  
+
+    event_id = data.get('event')
+    price_id = data.get('price')
 
     bouquets_query = Bouquet.objects.all()
 
-    match price_id:
-        case '1':
-            cost_filtered = bouquets_query.filter(price__lt=1000)
-        case '2':
-            cost_filtered = bouquets_query.filter(price__range=(1000, 5000))
-        case '3':
-            cost_filtered = bouquets_query.filter(price__gt=5000)
-        case '4':
-            cost_filtered = bouquets_query
-        case _:
-            cost_filtered = bouquets_query
+
+    if price_id == '1':
+        cost_filtered = bouquets_query.filter(price__lt=1000)
+    elif price_id == '2':
+        cost_filtered = bouquets_query.filter(price__range=(1000, 5000))
+    elif price_id == '3':
+        cost_filtered = bouquets_query.filter(price__gt=5000)
+    else:
+        cost_filtered = bouquets_query
+
 
     if not cost_filtered.exists():
         cost_filtered = Bouquet.objects.all()
 
     event_filtered = cost_filtered.filter(events__id=event_id).distinct()
 
-    if not event_filtered.exists():
-        final_filtered = cost_filtered
-    else:
-        final_filtered = event_filtered
-
-    bouquet_flowers_prefetch = Prefetch(
-        'bouquetflower_set',
-        queryset=Bouquet.objects.select_related('flower'),
-        to_attr='flower_items'
-    )
-
-    final_bouquets = final_filtered.prefetch_related(
-        bouquet_flowers_prefetch,
-    )
+    final_filtered = event_filtered if event_filtered.exists() else cost_filtered
 
     bouquet_list = []
-    for bouquet in final_bouquets:
-        flowers_lines = [
-            f"{bf.flower.name} - {bf.quantity} шт."
-            for bf in bouquet.bouquetflower_set.all()
-        ]
-        all_lines = flowers_lines
-        full_composition = "\n".join(all_lines) + "\n"
+    for bouquet in final_filtered:
         bouquet_data = {
             "id": bouquet.id,
             "name": bouquet.name,
-            "flowers": full_composition,
-            "price": int(bouquet.price),
+            "price": float(bouquet.price),  
             "width": float(bouquet.width),
-            "height": float(bouquet.length),
+            "height": float(bouquet.height),
             "img": bouquet.image.url if bouquet.image else "",
-            "description": bouquet.description
+            "description": bouquet.description,
+            "flowers": ", ".join([flower.name for flower in bouquet.flowers.all()])
         }
         bouquet_list.append(bouquet_data)
 

@@ -1,4 +1,4 @@
-{% load static %}
+{% load static humanize %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,37 +35,47 @@
 		<div class="container">
 			<div class="result p100">
 				<div class="title">Мы подобрали специально для Вас</div>
+
+				{% if bouquet %}
 				<div class="result__block ficb">
 					<div class="result__elems">
 						<div class="card__elems ">
 							<span class="card__elems_intro">Описание:</span>
 							<div class="card__items">
 								<p class="card__items_text card__items_text__first">
-									Этот букет передает атмосферу летнего утра в деревне. Букет создан из свежих полевых цветов, собранных в самом сердце природы. В состав букета входит ромашка, пионовидная роза, альстромерия, эустома, веточка эвкалипта, декоративная зелень. Все цветы собраны вручную и аккуратно высушены. 
-								</p>
-								<p class="card__items_text">
-									Букеты из полевых цветов - это не только прекрасный подарок, но и отличный способ выразить свои чувства.
+									{{ bouquet.description|default:"" }}
 								</p>
 							</div>
 						</div>
+
 						<div class="card__elems ">
 							<span class="card__elems_intro">Состав:</span>
 							<div class="card__items">
-								<p class="card__items_text card__items_text__first">
-									Альстромерия белая 1 шт., Эустома белая 1 шт, Ромашка 1 шт, Роза пионовидная 1 шт 
-								</p>
-
+								{% if bouquet.flowers %}
+									<p class="card__items_text card__items_text__first">
+										{{ bouquet.flowers|linebreaksbr }}
+									</p>
+								{% else %}
+									<p class="card__items_text">Нет доступных цветов.</p>
+								{% endif %}
 							</div>
 						</div>
 					</div>
-					<img src="{% static 'img/cardImg.jpg' %}" alt="result Img" class="result__block_img">
-					<form  class="result__items">
-						<div class="title result__items_title">Летнее утро</div>
-						<div class="result__items_price">3 600 руб</div>
-						<button type="submit" class="btn result__items_btn">Заказать букет</button>
-						<hr class="result__items_line" />
-						<div class="result__items_intro">Хотите что-то более специальное?</div>
-						 <div class="result__items_block">
+
+					{% if bouquet.img %}
+						<img src="{{ bouquet.img }}" alt="{{ bouquet.name }}" class="result__block_img">
+					{% else %}
+						<img src="{% static 'img/catalog/catalogBg3.jpg' %}" alt="{{ bouquet.name }}" class="result__block_img">
+					{% endif %}
+
+					<form method="post" action="{% url 'order' bouquet.id %}" class="result__items">
+						{% csrf_token %}
+						<div class="title result__items_title">{{ bouquet.name }}</div>
+                        <div class="result__items_price">{{ bouquet.price|floatformat:0|intcomma }} руб</div>
+                        <button type="submit" class="btn result__items_btn">Заказать букет</button>
+                        <hr class="result__items_line" />
+                        <div class="result__items_intro">Хотите что-то более специальное?</div>
+                        <div class="result__items_block">
                             <form action="{% url 'catalog' %}" method="get" >
                                 <button  class="btn largeBtn result__items_block__btn">Смотреть всю коллекцию</button>
                             </form>
@@ -77,6 +87,7 @@
 					</form>
 				</div>	
 			</div>
+			{% endif %}
 		</div>
 	</section>
 

@@ -126,6 +126,16 @@ class Order(models.Model):
         max_length=100,
         verbose_name='Адрес доставки'
     )
+    delivery_time_start = models.TimeField(
+        null=True,
+        blank=True,
+        verbose_name='Время доставки с'
+    )
+    delivery_time_end = models.TimeField(
+        null=True,
+        blank=True,
+        verbose_name='Время доставки по'
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата создания'

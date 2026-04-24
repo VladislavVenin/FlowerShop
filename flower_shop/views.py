@@ -1,7 +1,7 @@
 import random
+from datetime import time
 
 from django.contrib import messages
-from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -12,6 +12,7 @@ from more_itertools import chunked
 from .forms import ConsultationForm
 from .models import Bouquet, Event, Order
 from .payment import create_payment, yookassa_webhook
+from .utils import get_available_slots
 
 
 def index(request):
@@ -132,10 +133,48 @@ def result(request):
 def order(request, id):
     bouquet = get_object_or_404(Bouquet, id=id)
 
-    if request.method == "POST":
-        name = request.POST.get("fname")
-        phone = request.POST.get("tel")
-        address = request.POST.get("adres")
+    if request.method == 'POST':
+        name = request.POST.get('fname')
+        phone = request.POST.get('tel')
+        address = request.POST.get('adres')
+        slot_value = request.POST.get('orderTime')
+
+        if not slot_value or '|' not in slot_value:
+            messages.error(request, 'Пожалуйста, выберите интервал доставки.')
+            return render(
+                request,
+                'order.html',
+                {'bouquet': bouquet, 'time_slots': get_available_slots()}
+            )
+
+        try:
+            start_str, end_str = slot_value.split('|')
+            start_time = time.fromisoformat(start_str)
+            end_time = time.fromisoformat(end_str)
+        except ValueError:
+            messages.error(request, 'Некорректный формат времени доставки.')
+            return render(
+                request,
+                'order.html',
+                {'bouquet': bouquet, 'time_slots': get_available_slots()}
+            )
+
+        # проверка доступности если уже на странице
+        available_slots = get_available_slots()
+        chosen_slot = next(
+            (s for s in available_slots if s['start'] == start_time and s['end'] == end_time),
+            None
+        )
+        if not chosen_slot:
+            messages.error(
+                request,
+                'Выбранный интервал доставки более недоступен. Пожалуйста, выберите другой.'
+            )
+            return render(
+                request,
+                'order.html',
+                {'bouquet': bouquet, 'time_slots': available_slots}
+            )
 
         try:
             order = Order.objects.create(
@@ -143,25 +182,35 @@ def order(request, id):
                 client_name=name,
                 phone_number=phone,
                 address=address,
+                delivery_time_start=start_time,
+                delivery_time_end=end_time,
                 payment_status='pending'
             )
-        except ValidationError as e:
-            messages.error(request, f'Некорректный номер телефона: {e}')
-            context = {"bouquet": bouquet}
-            return render(request, "order.html", context)
+        except Exception as e:
+            messages.error(request, f'Ошибка при создании заказа:{e}')
+            return render(
+                request,
+                'order.html',
+                {'bouquet': bouquet, 'time_slots': get_available_slots()}
+            )
 
         try:
             payment_url = create_payment(order)
             return redirect(payment_url)
         except Exception as e:
-            messages.error(request, f'Не удалось создать платёж. Попробуйте позже. Ошибка: {e}')
-            context = {"bouquet": bouquet}
-            return render(request, "order.html", context)
+            messages.error(request, f'Не удалось создать платёж: {e}')
+            return render(
+                request,
+                'order.html',
+                {'bouquet': bouquet, 'time_slots': get_available_slots()}
+            )
 
-    context = {
-        "bouquet": bouquet,
-    }
-    return render(request, "order.html", context)
+    available_slots = get_available_slots()
+    return render(
+        request,
+        'order.html',
+        {'bouquet': bouquet, 'time_slots': available_slots}
+    )
 
 
 def payment_result(request):

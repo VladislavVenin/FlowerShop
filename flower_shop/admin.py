@@ -17,7 +17,6 @@ class BouquetAdmin(admin.ModelAdmin):
         'is_available', 'created_at'
     )
     list_editable = ('price', )
-    editable_fields = ('name', 'price')
     search_fields = ('name',)
     filter_horizontal = ('flowers', 'events')
 
@@ -27,6 +26,7 @@ class BouquetAdmin(admin.ModelAdmin):
             max-height: 200px;" alt="{}" />'''
         )
         return format_html(html_template, obj.image.url, obj.name)
+    image_preview.short_description = 'Предпросмотр изображения'
 
 
 class BouquetNullFilter(SimpleListFilter):
@@ -53,6 +53,11 @@ class OrderAdmin(admin.ModelAdmin):
         'bouquet', 'client_name', 'phone_number',
         'address', 'payment_status_display',
         'created_at'
+    )
+    readonly_fields = (
+        'created_at',
+        'yookassa_transaction_id',
+        'payment_status'
     )
     list_filter = (BouquetNullFilter,)
 
